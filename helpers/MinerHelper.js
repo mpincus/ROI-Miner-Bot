@@ -32,11 +32,6 @@ minerHelper.Sell(ethers minerContract, string tokenSymbol);
 exports.Sell = async function Sell(contract, token) {
     console.log('begin sell: ', token);
     console.log(contract.signer.getAddress());
-    let overrides = {
-        from: contract.signer.address,
-        gasPrice: contract.signer.estimateGas(),
-        gasLimit: 150000
-    }
     try {
         const button = await contract.sellEggs({
             //from: contract.signer.address,
@@ -51,18 +46,6 @@ exports.Sell = async function Sell(contract, token) {
         return Sell(contract,token);
     }
 }
-//USAGE
-/*
-BAKEDBEANS EXCLUSIVE
-var minerHelper = require('./helpers/MinerHelper');
-minerHelper.Rewards(ethers minerContract, ethers wallet.address);
-*/
-exports.beanRewards = async function beanRewards(contract, walletAddress) {
-    var result = await contract.beanRewards(walletAddress);
-    result = ethers.utils.formatEther(result);
- //   result = ethers.BigNumber.from(result).toString();
-    return result;
-}
 
 //USAGE: get unclaimed rewards
 /*
@@ -71,7 +54,6 @@ exports.beanRewards = async function beanRewards(contract, walletAddress) {
 exports.multiRewards = async function multiRewards(contract, walletAddress){
     var eggs = await contract.getEggsSinceLastHatch(walletAddress);
     var result = await contract.calculateEggSell(eggs);
-    //result = ethers.utils.formatEther(result);
     return result;
 }
 //USAGE
@@ -93,7 +75,7 @@ exports.MakeReadable = async function MakeReadable(bigNum){
     var temp;
     var length = ethers.BigNumber.from(bigNum).toString().length;
     if(ethers.BigNumber.isBigNumber(bigNum)){
-        if(length<10){ //because usdc miner is gay and coders kill leading 0s
+        if(length<10){ //because usdc miner coders kill leading 0s
             bigNum = ethers.utils.formatUnits(bigNum,length);
 
         }else{

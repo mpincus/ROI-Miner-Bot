@@ -4,36 +4,10 @@ const {Provider} = require("@ethersproject/abstract-provider");
 
 //USAGE
 /*
-var ethersHelper = require('./helpers/EthersHelper');
-async function Balance(){
-	console.log(await ethersHelper.GetNativeBalance(ethers RPC, ethers wallet.address));
-}
-Balance();
-*/
-exports.GetNativeBalance = async function GetNativeBalance(etherrpc, address) {
-	const balance = await etherrpc.getBalance(
-		address,
-		'latest'
-	);
-	var str = ethers.utils.formatEther(balance);
-	return str;
-}
-
-exports.GetERC20Balance = async function GetERC20Balance(contract, address, isStableCoin){
-    if(isStableCoin){
-        balance = ethers.utils.formatUnits(await contract.balanceOf(address),'mwei');
-    } else {
-        balance = ethers.utils.formatEther(await contract.balanceOf(address));
-    }
-    return balance;
-}
-//USAGE
-/*
 Ethers Provider.getBalance() will return the gas token of provider/rpc
 contract.balanceOf() will return all other tokens
-3rd paramenter is optional
 */
-exports.GetABalance = async function GetABalance(providerOrContract, walletAddress, name){
+exports.GetABalance = async function GetABalance(providerOrContract, walletAddress){
     if(Provider.isProvider(providerOrContract)){
         var balance = await providerOrContract.getBalance(
             walletAddress,
@@ -64,7 +38,6 @@ exports.getAllBalances = async function getAllBalances(arrOfProviderOrContracts,
     }
 	return tempStr;
 }
-//gotta change this
 exports.formatBalances = async function formatBalances(arrOfProviderOrContracts, arrOfWallets){
     var tempStr=new Array();
     var bal;
@@ -92,33 +65,7 @@ exports.formatBalances = async function formatBalances(arrOfProviderOrContracts,
     }
 	return tempStr;
 }
-//USAGE
-/*
-var ethersHelper = require('./helpers/EthersHelper');
-ethersHelper.GetNativeBalanceToConsole(ethers RPC, ethers wallet.address, string str);
-*/
-exports.GetNativeBalanceToConsole = async function GetNativeBalanceToConsole(etherrpc, address, str) {
-	const balance = await etherrpc.getBalance(
-		address,
-		'latest'
-	);
-	console.log(str, ': ', Number.parseFloat(await ethers.utils.formatEther(balance)).toFixed(6));
-}
 
-exports.ERC20BalanceToConsole = async function ERC20BalanceToConsole(contract, address, str, isStableCoin){
-    if(isStableCoin){
-        balance = await ethers.utils.formatUnits(await contract.balanceOf(address),'mwei');
-    } else {
-        balance = await ethers.utils.formatEther(await contract.balanceOf(address));
-    }
-    console.log(str, ': ', Number.parseFloat(balance).toFixed(6));
-}
-
-//USAGE
-/*
-var ethersHelper = require('./helpers/EthersHelper');
-etherHelper.WaitForUser();
-*/
 exports.WaitForUser = async function WaitForUser() {
     const readline = require("readline");
 

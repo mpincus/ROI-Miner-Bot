@@ -4,17 +4,19 @@ const minerHelper = require('./helpers/MinerHelper');
 const etherHelper = require('./helpers/EthersHelper');
 const abi = require('erc-20-abi');
 
-//intialize RPCs(providers)
+//initialize RPCs(providers)
 const ftmRPC = new ethers.providers.JsonRpcProvider(process.env.FTM_RPC_URL);
 const maticRPC = new ethers.providers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
 const avaxRPC = new ethers.providers.JsonRpcProvider(process.env.AVAX_RPC_URL);
 const bnbRPC = new ethers.providers.JsonRpcProvider(process.env.BNB_RPC_URL);
-//intialize wallets, cant think of a better way to do this
-const polywalletaed = new ethers.Wallet(process.env.PKEY_three, maticRPC);
-const polywalletb16c = new ethers.Wallet(process.env.PKEY_two, maticRPC);
-const avaxwalletb16c = new ethers.Wallet(process.env.PKEY_two, avaxRPC);
-const ftmwalletb16c = new ethers.Wallet(process.env.PKEY_two, ftmRPC);
-const bnbwalletb16c = new ethers.Wallet(process.env.PKEY_two, bnbRPC);
+//initialize wallets, cant think of a better way to do this
+const ethersWallet = [
+	ethers.Wallet(process.env.PKEY_three, maticRPC),
+	ethers.Wallet(process.env.PKEY_two, maticRPC),
+	ethers.Wallet(process.env.PKEY_two, avaxRPC),
+	ethers.Wallet(process.env.PKEY_two, ftmRPC),
+	ethers.Wallet(process.env.PKEY_two, bnbRPC),
+]
 //smartcontract ABIs
 const MULTI_MINER_ABI = [{ "constant": true, "inputs": [], "name": "ceoAddress", "outputs": [{ "name": "", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getMyMiners", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getBalance", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "initialized", "outputs": [{ "name": "", "type": "bool" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "rt", "type": "uint256" }, { "name": "rs", "type": "uint256" }, { "name": "bs", "type": "uint256" }], "name": "calculateTrade", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "eth", "type": "uint256" }, { "name": "contractBalance", "type": "uint256" }], "name": "calculateEggBuy", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "marketEggs", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "sellEggs", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [{ "name": "amount", "type": "uint256" }], "name": "devFee", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "pure", "type": "function" }, { "constant": false, "inputs": [], "name": "seedMarket", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "constant": false, "inputs": [{ "name": "ref", "type": "address" }], "name": "hatchEggs", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getMyEggs", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "address" }], "name": "lastHatch", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "address" }], "name": "claimedEggs", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "address" }], "name": "hatcheryMiners", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "EGGS_TO_HATCH_1MINERS", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "eth", "type": "uint256" }], "name": "calculateEggBuySimple", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "eggs", "type": "uint256" }], "name": "calculateEggSell", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "", "type": "address" }], "name": "referrals", "outputs": [{ "name": "", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "ceoAddress2", "outputs": [{ "name": "", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "name": "adr", "type": "address" }], "name": "getEggsSinceLastHatch", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "name": "ref", "type": "address" }], "name": "buyEggs", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }]
 const TOASTED_AVAX_ABI = [{ "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }], "name": "OwnershipTransferred", "type": "event" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "beanRewards", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "ref", "type": "address" }], "name": "buyEggs", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "eth", "type": "uint256" }, { "internalType": "uint256", "name": "contractBalance", "type": "uint256" }], "name": "calculateEggBuy", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "eth", "type": "uint256" }], "name": "calculateEggBuySimple", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "eggs", "type": "uint256" }], "name": "calculateEggSell", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "fund", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [], "name": "getBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "getEggsSinceLastHatch", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "getMyEggs", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "adr", "type": "address" }], "name": "getMyMiners", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "ref", "type": "address" }], "name": "getReferredMiners", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "ref", "type": "address" }], "name": "hatchEggs", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "seedMarket", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [], "name": "sellEggs", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bool", "name": "newVal", "type": "bool" }], "name": "setInitialized", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "bool", "name": "newVal", "type": "bool" }], "name": "setOpen", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_dailyReward", "type": "uint256" }], "name": "updateDailyReward", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_devFeeVal", "type": "uint256" }], "name": "updateDevFee", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address payable", "name": "_recAdd", "type": "address" }], "name": "updateRecAddr", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "_refFee", "type": "uint256" }], "name": "updateRefFee", "outputs": [], "stateMutability": "nonpayable", "type": "function" }]
@@ -32,17 +34,17 @@ const BAKED_BEANS_BNB_CONTRACT = "0xE2D26507981A4dAaaA8040bae1846C14E0Fb56bF";
 const multiMinerTokens = ['MATICw3', 'USDC', 'MATICw2', 'AVAX', 'FTM', 'SPELL', 'TOMB'];
 const bakeHouseTokens = ['AVAX', 'BNB'];
 const multiMiner = [
-	new ethers.Contract(MATIC_MINER_CONTRACT, MULTI_MINER_ABI, polywalletaed),
-	new ethers.Contract(POLYGON_USDC_MINER_CONTRACT, MULTI_MINER_ABI, polywalletaed),
-	new ethers.Contract(MATIC_MINER_CONTRACT, MULTI_MINER_ABI, polywalletb16c),
-	new ethers.Contract(AVAX_MINER_CONTRACT, MULTI_MINER_ABI, avaxwalletb16c),
-	new ethers.Contract(FTM_MINER_CONTRACT, MULTI_MINER_ABI, ftmwalletb16c),
-	new ethers.Contract(SPELL_MINER_CONTRACT, MULTI_MINER_ABI, ftmwalletb16c),
-	new ethers.Contract(TOMB_MINER_CONTRACT, MULTI_MINER_ABI, ftmwalletb16c),
+	new ethers.Contract(MATIC_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[0]),
+	new ethers.Contract(POLYGON_USDC_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[0]),
+	new ethers.Contract(MATIC_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[1]),
+	new ethers.Contract(AVAX_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[2]),
+	new ethers.Contract(FTM_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3]),
+	new ethers.Contract(SPELL_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3]),
+	new ethers.Contract(TOMB_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3]),
 ];
 const bakeHouse = [
-	new ethers.Contract(TOASTED_AVAX_CONTRACT, TOASTED_AVAX_ABI, avaxwalletb16c),
-	new ethers.Contract(BAKED_BEANS_BNB_CONTRACT, BAKED_BEANS_ABI, bnbwalletb16c),
+	new ethers.Contract(TOASTED_AVAX_CONTRACT, TOASTED_AVAX_ABI, ethersWallet[2]),
+	new ethers.Contract(BAKED_BEANS_BNB_CONTRACT, BAKED_BEANS_ABI, ethersWallet[4]),
 ];
 
 //token addresses and contracts
@@ -67,10 +69,9 @@ const balanceArr = [
 	tombContract,
 	elkContract
 ]
-//only necassary for gastokens that i cant find contract address for
 const walletArr = [
-	polywalletb16c.address,
-	polywalletaed.address
+	ethersWallet[0].address,
+	ethersWallet[1].address
 ]
 iBalance = []; oBalance = []; rBalance = [];
 
@@ -89,20 +90,20 @@ async function main() {
 	*/
 	iBalance = await etherHelper.formatBalances(balanceArr, walletArr);
 	/*
-	copy iBalance to iBalanceFormat, not necassary as is
+	copy iBalance to iBalanceFormat, not necessary as is
 	could decrease iterations using regex and array.split()
-	to remove formating but fuck regex
+	to remove formatting but fuck regex
 	*/
 	iBalanceFormat = iBalance.map((x) => x);
 	await SaveData('balance.txt', iBalanceFormat);
 	/*
-	empty iBalance array, may or maynot be necassary
+	empty iBalance array, may or maynot be necessary
 	*/
 	iBalance.forEach((i) => {
 		iBalance.pop();
 	})
 	/*
-	hold initial balances, without formating, to compare later
+	hold initial balances, without formatting, to compare later
 	 */
 	iBalance = await etherHelper.getAllBalances(balanceArr, walletArr);
 	/*
@@ -148,13 +149,12 @@ async function main() {
 	}
 	/*
 	create remove extra lines from iBalanceFormat to get symbol data 
-	cause multiverse of blockchain doesnt believe in standardizing symbols
+	cause blockchains dont play nice
 	*/
 	iBalanceFormat.removeByValue(/.+?(?=:)/);
 	/*
-	record difference in balance to see gains(and gasfee if counpounding)
-	regex looks for data preceeding :, then concat difference
-	in hindsight could have used whitepsace for regex
+	record difference in balance to see gains(and gasfee if compounding)
+	regex looks for data preceding :, then concat difference
 	*/
 	oBalance = await etherHelper.getAllBalances(balanceArr, walletArr)
 	for (var i in oBalance) {
