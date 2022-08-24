@@ -27,3 +27,17 @@
 	USDC: 0
 	ELK: 0
 	
+2022:8:23
+	MATIC: 0
+	BNB: 0
+	AVAX: 0
+	FTM: 0
+	SPELL: 0
+	TOMB: 0
+	ELK: 0
+	MATIC: 0
+	BNB: 0
+	AVAX: 0
+	USDC: 0
+	ELK: 0
+	
