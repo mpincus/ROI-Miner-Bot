@@ -88,7 +88,7 @@ async function main() {
 	keep daily record of unclaimed rewards
 	probably a way to code this with less code
 	*/
-	rewards1 = []; rewards2 = []; rewards3[];
+	rewards1 = []; rewards2 = []; rewards3 = [];
 	rewards1 = await minerHelper.getAllUnclaimedRewards(bakeHouse, bakeHouseTokens, 'BakeHouse');
 	rewards2 = await minerHelper.getAllUnclaimedRewards(multiMiner, multiMinerTokens, 'MultiMiner');
 	rewards3 = await minerHelper.getAllUnclaimedRewards(fortuneHunters, fortuneHunersTokens, 'FortuneHunters');
@@ -118,7 +118,7 @@ async function main() {
 	/*
 	alternate days compound and pocket of multichain miner //sunday=0
 	*/
-	
+
 	if ((dateObject.getDay() % 2) == 0) {
 		for (let i = 0; i < multiMiner.length; i++) {
 			await minerHelper.Compound(multiMiner[i], multiMinerTokens[i]);
@@ -129,7 +129,7 @@ async function main() {
 		}
 	}
 	//	bakedbeans and toastedavax sell friday, compound other days   
-	
+
 	if (dateObject.getDay() == 5) {
 		for (let i = 0; i < bakeHouse.length; i++) {
 			await minerHelper.Sell(bakeHouse[i], bakeHouseTokens[i]);
@@ -140,16 +140,20 @@ async function main() {
 		}
 	}
 	//fortune hunters sell 1st and 15th of month, compound others
-	if(dateObject.getDay() == 0 || dateObject.getDay() == 14){
-		for(let i=0;i<fortuneHunters.length;i++){
+	if (dateObject.getDay() === 0 || dateObject.getDay() === 14) {
+		for (let i = 0; i < fortuneHunters.length; i++) {
 			await minerHelper.Sell(fortuneHunters[i], fortuneHunersTokens[i]);
 		}
-	 } else {
-		for(let i=0;i<fortuneHunters.length;i++){
-			await minerHelper.Compound(fortuneHunters[i], fortuneHunersTokens[i]);
+	} else {
+		var t = await minerHelper.multiRewards(fortuneHunters[0], fortuneHunters[0].signer.address);
+		t = await minerHelper.MakeReadable(t);
+		if (t > 15) { //only if atleast 15 elk available for lotto
+			for (let i = 0; i < fortuneHunters.length; i++) {
+				await minerHelper.Compound(fortuneHunters[i], fortuneHunersTokens[i]);
+			}
 		}
 	}
-	
+
 	/*
 	keep daily of record change in wallet balances
 	cause javascript is gay doesnt provide method for removing from

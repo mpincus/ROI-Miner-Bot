@@ -1,5 +1,5 @@
 const ethers = require('ethers');
-
+var retry=0;
 //USAGE
 /*
 var minerHelper = require('./helpers/MinerHelper');
@@ -13,6 +13,7 @@ exports.Compound = async function Compound(contract, token) {
         gasPrice: contract.signer.getGasPrice(),
         gasLimit: 150000
     }
+    if(retry<2){
     try {
         const compButton = await contract.hatchEggs(contract.signer.address, overrides)
         const txReceipt = await compButton.wait()
@@ -20,8 +21,12 @@ exports.Compound = async function Compound(contract, token) {
     } catch (err) {
         console.log('compound error:  ', token + ' ' + err.message)
         console.log('\nretry');
+        retry++;
         return Compound(contract, token);
     }
+    retry = 0;
+
+}
 }
 
 //USAGE
@@ -32,6 +37,7 @@ minerHelper.Sell(ethers minerContract, string tokenSymbol);
 exports.Sell = async function Sell(contract, token) {
     console.log('begin sell: ', token);
     console.log(contract.signer.getAddress());
+    if(retry<2){
     try {
         const button = await contract.sellEggs({
             //from: contract.signer.address,
@@ -40,11 +46,14 @@ exports.Sell = async function Sell(contract, token) {
         })
         const txReceipt = await button.wait()
         console.log('sell status: ', token + ': ' + txReceipt.status + ': GasUsed' + txReceipt.gasUsed)
+        retry=0;
     } catch (err) {
         console.log('sell error:  ', token + ': ' + err.message)
         console.log('\nretry');
+        retry++;
         return Sell(contract,token);
     }
+}
 }
 
 //USAGE: get unclaimed rewards
