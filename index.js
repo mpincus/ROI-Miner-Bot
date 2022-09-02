@@ -94,23 +94,7 @@ async function main() {
 	rewards3 = await minerHelper.getAllUnclaimedRewards(fortuneHunters, fortuneHunersTokens, 'FortuneHunters');
 	rewards = rewards1.concat(rewards2, rewards3);
 	await SaveData('rewards.txt', rewards);
-	/*
-	store initial balances
-	*/
-	iBalance = await etherHelper.formatBalances(balanceArr, walletArr);
-	/*
-	copy iBalance to iBalanceFormat, not necessary as is
-	could decrease iterations using regex and array.split()
-	to remove formatting but fuck regex
-	*/
-	iBalanceFormat = iBalance.map((x) => x);
-	await SaveData('balance.txt', iBalanceFormat);
-	/*
-	empty iBalance array, may or maynot be necessary
-	*/
-	iBalance.forEach((i) => {
-		iBalance.pop();
-	})
+
 	/*
 	hold initial balances, without formatting, to compare later
 	 */
@@ -153,7 +137,11 @@ async function main() {
 			}
 		}
 	}
-
+	/*
+	store new balances
+	*/
+	iBalanceFormat = await etherHelper.formatBalances(balanceArr, walletArr);
+	await SaveData('balance.txt', iBalanceFormat);
 	/*
 	keep daily of record change in wallet balances
 	cause javascript is gay doesnt provide method for removing from
