@@ -35,7 +35,7 @@ const BAKED_BEANS_BNB_CONTRACT = "0xE2D26507981A4dAaaA8040bae1846C14E0Fb56bF";
 const ELK_OF_FORTUNE_MINER_CONTRACT = "0xc36d17085b26fc5dCBBB46A6A2068b3AdE2CdAb5"
 
 //symbols for rewards.txt, could prob simplify this
-const multiMinerTokens = ['MATICw3', 'USDC', 'MATICw2', 'AVAX', 'FTM', 'SPELL', 'TOMB'];
+const multiMinerTokens = ['MATIC', 'USDC', 'MATIC', 'AVAX', 'FTM', 'SPELL', 'TOMB'];
 const bakeHouseTokens = ['AVAX', 'BNB'];
 const fortuneHunersTokens = ['ELK'];
 const multiMiner = [
@@ -83,6 +83,46 @@ const walletArr = [
 ]
 iBalance = []; oBalance = []; rBalance = [];
 
+const XLSX = require("xlsx");
+const sheet = require('spread_sheet');
+/* 
+start with timestamp as string, concat string with each element of array
+then save string to file
+*/
+async function SaveData(file, tempStr) {
+	var str = '\n' + dateObject.getFullYear() + ':' + (dateObject.getMonth() + 1) + ':' + dateObject.getDate() + '\n\t';
+	tempStr.forEach((item) => {
+		str = str + item + '\n\t';
+	});
+	etherHelper.AppendFile(file, str);
+}
+
+function exportToExcel(aoa, sheetName){
+	var str = [[dateObject.getFullYear() + ':' + (dateObject.getMonth() + 1) + ':' + dateObject.getDate()]];
+	var strarr = [];
+	let aoa2 = aoa.map(x=>' '+x);
+	aoa2.forEach(item=>{
+			strarr.push(item.split(' '));
+		});
+	sheet.addRow(str, './MinerStats.xlsx', sheetName,function(err,result){});
+	sheet.addRow(strarr, './MinerStats.xlsx', sheetName,function(err,result){});
+}
+
+
+
+function initializeSheets(){
+	var fs = require('fs');
+	if(!fs.existsSync('./MinerStats.xlsx')){
+
+			var workbook = XLSX.utils.book_new();
+			workbook.SheetNames.push('PNL');
+			workbook.SheetNames.push('Rewards');
+			workbook.SheetNames.push('Balance');			
+			XLSX.writeFile(workbook, "MinerStats.xlsx");
+
+		}
+	}
+
 async function main() {
 	/*
 	keep daily record of unclaimed rewards
@@ -93,6 +133,10 @@ async function main() {
 	rewards2 = await minerHelper.getAllUnclaimedRewards(multiMiner, multiMinerTokens, 'MultiMiner');
 	rewards3 = await minerHelper.getAllUnclaimedRewards(fortuneHunters, fortuneHunersTokens, 'FortuneHunters');
 	rewards = rewards1.concat(rewards2, rewards3);
+
+	initializeSheets();
+	exportToExcel(rewards, 'Rewards');
+
 	await SaveData('rewards.txt', rewards);
 
 	/*
@@ -137,10 +181,12 @@ async function main() {
 			}
 		}
 	}
+
 	/*
 	store new balances
 	*/
 	iBalanceFormat = await etherHelper.formatBalances(balanceArr, walletArr);
+	exportToExcel(iBalanceFormat,'Balance');
 	await SaveData('balance.txt', iBalanceFormat);
 	/*
 	keep daily of record change in wallet balances
@@ -173,20 +219,9 @@ async function main() {
 		t = (iBalanceFormat[i].match(/.+?(?=:)/)) + ': ' + t;
 		rBalance.push(t);
 	}
+	exportToExcel(rBalance, 'PNL');
 	SaveData('pnl.txt', rBalance);
 
 	etherHelper.WaitForUser();
 }
 main();
-/* 
-start with timestamp as string, concat string with each element of array
-then save string to file
-*/
-async function SaveData(file, tempStr) {
-	var str = '\n' + dateObject.getFullYear() + ':' + (dateObject.getMonth() + 1) + ':' + dateObject.getDate() + '\n\t';
-	tempStr.forEach((item) => {
-		str = str + item + '\n\t';
-	});
-	etherHelper.AppendFile(file, str);
-}
-

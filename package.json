@@ -19,6 +19,8 @@
   "dependencies": {
     "dotenv": "^16.0.1",
     "erc-20-abi": "^1.0.0",
-    "ethers": "^5.7.0"
+    "ethers": "^5.7.0",
+    "spread_sheet": "^2.2.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz"
   }
 }
