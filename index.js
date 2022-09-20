@@ -146,7 +146,6 @@ async function main() {
 	/*
 	alternate days compound and pocket of multichain miner //sunday=0
 	*/
-
 	if ((dateObject.getDay() % 2) == 0) {
 		for (let i = 0; i < multiMiner.length; i++) {
 			await minerHelper.Compound(multiMiner[i], multiMinerTokens[i]);
@@ -181,7 +180,6 @@ async function main() {
 			}
 		}
 	}
-
 	/*
 	store new balances
 	*/
