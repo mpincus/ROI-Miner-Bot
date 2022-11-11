@@ -132,3 +132,4 @@ dist
 .rewards.txt
 .ROI-Miner-Bot.code-workspace
 ROI-Miner-Bot.code-workspace
+*.xlsx
