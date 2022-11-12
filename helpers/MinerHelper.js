@@ -23,13 +23,14 @@ exports.Compound = async function Compound(contract, token) {
             }
             const txReceipt = await compButton.wait()
             console.log('compound status: ', token + ' ' + txReceipt.status)
+            retry = 0;
+
         } catch (err) {
             console.log('compound error:  ', token + ' ' + err.message)
             console.log('\nretry');
            retry++;
            return Compound(contract, token);
         }
-       retry = 0;
 
    }
 }
@@ -51,13 +52,14 @@ exports.Sell = async function Sell(contract, token) {
             })
             const txReceipt = await button.wait()
             console.log('sell status: ', token + ': ' + txReceipt.status + ': GasUsed' + txReceipt.gasUsed)
+            retry = 0;
+
         } catch (err) {
             console.log('sell error:  ', token + ': ' + err.message)
             console.log('\nretry');
            retry++;
            return Sell(contract, token);
         }
-        retry = 0;
 
    }
 }
