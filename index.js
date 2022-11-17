@@ -55,8 +55,10 @@ const bakeHouse = [
 const fortuneHunters = [
 	new ethers.Contract(ELK_OF_FORTUNE_MINER_CONTRACT, ELK_OF_FORTUNE_ABI, ethersWallet[4]),
 	new ethers.Contract(CAKE_OF_FORTUNE__CONTRACT, CAKE_OF_FORTUNE_ABI, ethersWallet[4])
-]
-
+];
+const frostedFlakes = [
+	new ethers.Contract(FROSTED_FLAKES_CONTRACT, FROSTED_FLAKES_ABI, ethersWallet[4])
+];
 //token addresses and contracts
 const usdcToken = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const spellToken = "0x468003b688943977e6130f4f68f23aad939a1040";
@@ -188,6 +190,19 @@ async function main() {
 			}
 		}
 	}
+	//frostedFlakes, data not recorded need to implement 11/17/22
+	//SELL/DEFROST AND ENABLE AUTOCOMPOUND
+	if(dateObject,getDay()==5){
+		for(let i=0;i<frostedFlakes.length;i++){
+			frostedFlakesDefrost(frostedFlakes[i], "frostedFlakes");
+		}
+
+	}
+	//DISABLE AUTOCOMPOUND
+	if(dateObject.getDay()==4){
+		for(let i=0;i<frostedFlakes.length;i++){
+			frostedFlakesDisableCompound(frostedFlakes[i], "frostedFlakes");
+	}
 	/*
 	store new balances
 	*/
@@ -228,15 +243,55 @@ async function main() {
 	exportToExcel(rBalance, 'PNL');
 	SaveData('pnl.txt', rBalance);
 
-	etherHelper.WaitForUser();
+	//etherHelper.WaitForUser();
 }
+
+async function frostedFlakesDefrost(contract, token){
+	console.log('begin defrost: ', token);
+    console.log(contract.signer.getAddress());
+    let overrides = {
+        from: contract.signer.address,
+        gasPrice: contract.signer.getGasPrice(),
+        gasLimit: 150000
+    }
+    try {
+        const compButton = await contract.defrost(contract.signer.address, overrides);
+		await contract.enableAutoCompounding();
+        const txReceipt = await compButton.wait()
+        console.log('defrost status: ', token + ' ' + txReceipt.status)
+    } catch (err) {
+        console.log('defrost error:  ', token + ' ' + err.message)
+        console.log('\nretry');
+        return Compound(contract, token);
+    }
+}
+async function frostedFlakesDisableCompound(contract, token){
+	console.log('disable autocompound: ', token);
+    console.log(contract.signer.getAddress());
+    let overrides = {
+        from: contract.signer.address,
+        gasPrice: contract.signer.getGasPrice(),
+        gasLimit: 150000
+    }
+    try {
+        const compButton = await contract.disableAutoCompounding(contract.signer.address, overrides)
+        const txReceipt = await compButton.wait()
+        console.log('compound status: ', token + ' ' + txReceipt.status)
+    } catch (err) {
+        console.log('compound error:  ', token + ' ' + err.message)
+        console.log('\nretry');
+        return Compound(contract, token);
+    }
+}
+
 main();
 
 
 
 // const frostedFlakes = new ethers.Contract(FROSTED_FLAKES_CONTRACT, FROSTED_FLAKES_ABI, ethersWallet[4]);
 
-// async function test(){
-// 	console.log(await frostedFlakes.getFirstDeposit(walletArr[1]));
-// }
-// test();
+//  async function test(){
+// // 	console.log(await frostedFlakes.getFirstDeposit(walletArr[1]));
+// 	console.log(frostedFlakes);
+//  }
+//  test();
