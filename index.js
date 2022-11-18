@@ -2,8 +2,9 @@ require('dotenv').config();
 const ethers = require('ethers');
 const minerHelper = require('./helpers/MinerHelper');
 const etherHelper = require('./helpers/EthersHelper');
+const ff = require('./FrostedFlakes');
 const abi = require('erc-20-abi');
-const {MULTI_MINER_ABI, TOASTED_AVAX_ABI, BAKED_BEANS_ABI, ELK_OF_FORTUNE_ABI, CAKE_OF_FORTUNE_ABI, FROSTED_FLAKES_ABI} = require('./MinerABIs.js');
+const { MULTI_MINER_ABI, TOASTED_AVAX_ABI, BAKED_BEANS_ABI, ELK_OF_FORTUNE_ABI, CAKE_OF_FORTUNE_ABI, FROSTED_FLAKES_ABI } = require('./MinerABIs.js');
 
 //initialize RPCs(providers)
 const ftmRPC = new ethers.providers.JsonRpcProvider(process.env.FTM_RPC_URL);
@@ -69,7 +70,7 @@ const usdcContract = new ethers.Contract(usdcToken, abi, maticRPC);
 const spellContract = new ethers.Contract(spellToken, abi, ftmRPC);
 const tombContract = new ethers.Contract(tombToken, abi, ftmRPC);
 const elkContract = new ethers.Contract(elkToken, abi, bnbRPC);
-const cakeContract = new ethers.Contract(cakeToken,abi,bnbRPC)
+const cakeContract = new ethers.Contract(cakeToken, abi, bnbRPC)
 
 const dateObject = new Date();
 //providers and contracts to get balances
@@ -104,31 +105,31 @@ async function SaveData(file, tempStr) {
 	etherHelper.AppendFile(file, str);
 }
 
-function exportToExcel(aoa, sheetName){
+function exportToExcel(aoa, sheetName) {
 	var str = [[dateObject.getFullYear() + ':' + (dateObject.getMonth() + 1) + ':' + dateObject.getDate()]];
 	var strarr = [];
-	let aoa2 = aoa.map(x=>' '+x);
-	aoa2.forEach(item=>{
-			strarr.push(item.split(' '));
-		});
-	sheet.addRow(str, './MinerStats.xlsx', sheetName,function(err,result){});
-	sheet.addRow(strarr, './MinerStats.xlsx', sheetName,function(err,result){});
+	let aoa2 = aoa.map(x => ' ' + x);
+	aoa2.forEach(item => {
+		strarr.push(item.split(' '));
+	});
+	sheet.addRow(str, './MinerStats.xlsx', sheetName, function (err, result) { });
+	sheet.addRow(strarr, './MinerStats.xlsx', sheetName, function (err, result) { });
 }
 
 
 
-function initializeSheets(){
+function initializeSheets() {
 	var fs = require('fs');
-	if(!fs.existsSync('./MinerStats.xlsx')){
+	if (!fs.existsSync('./MinerStats.xlsx')) {
 
-			var workbook = XLSX.utils.book_new();
-			workbook.SheetNames.push('PNL');
-			workbook.SheetNames.push('Rewards');
-			workbook.SheetNames.push('Balance');			
-			XLSX.writeFile(workbook, "MinerStats.xlsx");
+		var workbook = XLSX.utils.book_new();
+		workbook.SheetNames.push('PNL');
+		workbook.SheetNames.push('Rewards');
+		workbook.SheetNames.push('Balance');
+		XLSX.writeFile(workbook, "MinerStats.xlsx");
 
-		}
 	}
+}
 
 async function main() {
 	/*
@@ -168,46 +169,53 @@ async function main() {
 		for (let i = 0; i < bakeHouse.length; i++) {
 			await minerHelper.Sell(bakeHouse[i], bakeHouseTokens[i]);
 		}
-		
+
 	} else {
 		for (let i = 0; i < bakeHouse.length; i++) {
 			await minerHelper.Compound(bakeHouse[i], bakeHouseTokens[i]);
 		}
 	}
 	//fortune hunters sell 1st and 15th of month, compound others
-//	if (dateObject.getDay() === 0 || dateObject.getDay() === 14) {
+	//	if (dateObject.getDay() === 0 || dateObject.getDay() === 14) {
 	if (dateObject.getDay() == 2 || dateObject.getDay() == 5) {
 
 		for (let i = 0; i < fortuneHunters.length; i++) {
 			await minerHelper.Sell(fortuneHunters[i], fortuneHunersTokens[i]);
 		}
 	} else {
-		var t = await minerHelper.multiRewards(fortuneHunters[0], fortuneHunters[0].signer.address);
-		t = await minerHelper.MakeReadable(t);
-		if (t > 15) { //only if atleast 15 elk available for lotto
-			for (let i = 0; i < fortuneHunters.length; i++) {
-				await minerHelper.Compound(fortuneHunters[i], fortuneHunersTokens[i]);
-			}
+		// var t = await minerHelper.multiRewards(fortuneHunters[0], fortuneHunters[0].signer.address);
+		// t = await minerHelper.MakeReadable(t);
+		// if (t > 15) { //only if atleast 15 elk available for lotto
+		for (let i = 0; i < fortuneHunters.length; i++) {
+			await minerHelper.Compound(fortuneHunters[i], fortuneHunersTokens[i]);
 		}
 	}
+	//}
 	//frostedFlakes, data not recorded need to implement 11/17/22
-	//SELL/DEFROST AND ENABLE AUTOCOMPOUND
-	if(dateObject,getDay()==5){
-		for(let i=0;i<frostedFlakes.length;i++){
-			frostedFlakesDefrost(frostedFlakes[i], "frostedFlakes");
-		}
-
-	}
 	//DISABLE AUTOCOMPOUND
-	if(dateObject.getDay()==4){
-		for(let i=0;i<frostedFlakes.length;i++){
-			frostedFlakesDisableCompound(frostedFlakes[i], "frostedFlakes");
+	if (dateObject.getDay() == 4) {
+		for (let i = 0; i < frostedFlakes.length; i++) {
+			ff.frostedFlakesDisableCompound(frostedFlakes[i], "frostedFlakes");
+		}
+	}
+	//SELL/DEFROST
+	if (dateObject.getDay() == 5) {
+		for (let i = 0; i < frostedFlakes.length; i++) {
+			ff.frostedFlakesDefrost(frostedFlakes[i], "frostedFlakes");
+		}
+	}
+	//ENABLE AUTOCOMPOUND
+	if (dateObject.getDay() == 6) {
+		for (let i = 0; i < frostedFlakes.length; i++) {
+			ff.frostedFlakesEnableCompound(frostedFlakes[i], "frostedFlakes");
+
+		}
 	}
 	/*
 	store new balances
 	*/
 	iBalanceFormat = await etherHelper.formatBalances(balanceArr, walletArr);
-	exportToExcel(iBalanceFormat,'Balance');
+	exportToExcel(iBalanceFormat, 'Balance');
 	await SaveData('balance.txt', iBalanceFormat);
 	/*
 	keep daily of record change in wallet balances
@@ -244,44 +252,7 @@ async function main() {
 	SaveData('pnl.txt', rBalance);
 
 	//etherHelper.WaitForUser();
-}
 
-async function frostedFlakesDefrost(contract, token){
-	console.log('begin defrost: ', token);
-    console.log(contract.signer.getAddress());
-    let overrides = {
-        from: contract.signer.address,
-        gasPrice: contract.signer.getGasPrice(),
-        gasLimit: 150000
-    }
-    try {
-        const compButton = await contract.defrost(contract.signer.address, overrides);
-		await contract.enableAutoCompounding();
-        const txReceipt = await compButton.wait()
-        console.log('defrost status: ', token + ' ' + txReceipt.status)
-    } catch (err) {
-        console.log('defrost error:  ', token + ' ' + err.message)
-        console.log('\nretry');
-        return Compound(contract, token);
-    }
-}
-async function frostedFlakesDisableCompound(contract, token){
-	console.log('disable autocompound: ', token);
-    console.log(contract.signer.getAddress());
-    let overrides = {
-        from: contract.signer.address,
-        gasPrice: contract.signer.getGasPrice(),
-        gasLimit: 150000
-    }
-    try {
-        const compButton = await contract.disableAutoCompounding(contract.signer.address, overrides)
-        const txReceipt = await compButton.wait()
-        console.log('compound status: ', token + ' ' + txReceipt.status)
-    } catch (err) {
-        console.log('compound error:  ', token + ' ' + err.message)
-        console.log('\nretry');
-        return Compound(contract, token);
-    }
 }
 
 main();
