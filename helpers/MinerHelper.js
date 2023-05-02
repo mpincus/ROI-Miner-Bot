@@ -1,4 +1,5 @@
 const ethers = require('ethers');
+const etherHelper = require('./EthersHelper');
 var retry = 0;
 //USAGE
 /*
@@ -22,7 +23,8 @@ exports.Compound = async function Compound(contract, token) {
                 var compButton = await contract.hatchEggs(contract.signer.address, overrides)
             }
             const txReceipt = await compButton.wait()
-            console.log('compound status: ', token + ' ' + txReceipt.status)
+            let statusStr = 'compound status: ' + token + ' ' + txReceipt.status;
+            etherHelper.AppendFile("log.txt", statusStr);
             retry = 0;
 
         } catch (err) {
@@ -55,6 +57,8 @@ exports.Sell = async function Sell(contract, token) {
                 })
             }
             const txReceipt = await button.wait()
+            let statusStr = 'sell status: ' + token + ' ' + txReceipt.status;
+            etherHelper.AppendFile("log.txt", statusStr);
             console.log('sell status: ', token + ': ' + txReceipt.status + ': GasUsed' + txReceipt.gasUsed)
             retry = 0;
 

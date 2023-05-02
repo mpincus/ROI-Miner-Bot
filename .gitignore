@@ -133,3 +133,4 @@ dist
 .ROI-Miner-Bot.code-workspace
 ROI-Miner-Bot.code-workspace
 *.xlsx
+.log.txt

@@ -4,7 +4,7 @@ const minerHelper = require('./helpers/MinerHelper');
 const etherHelper = require('./helpers/EthersHelper');
 const ff = require('./FrostedFlakes');
 const abi = require('erc-20-abi');
-const { MULTI_MINER_ABI, TOASTED_AVAX_ABI, BAKED_BEANS_ABI, ELK_OF_FORTUNE_ABI, CAKE_OF_FORTUNE_ABI, FROSTED_FLAKES_ABI } = require('./MinerABIs.js');
+const { MULTI_MINER_ABI, TOASTED_AVAX_ABI, BAKED_BEANS_ABI, ELK_OF_FORTUNE_ABI, CAKE_OF_FORTUNE_ABI, FROSTED_FLAKES_ABI, THE_FORTUNE_MINER_BNB_ABI } = require('./MinerABIs.js');
 
 //initialize RPCs(providers)
 const ftmRPC = new ethers.providers.JsonRpcProvider(process.env.FTM_RPC_URL);
@@ -32,33 +32,34 @@ const TOASTED_AVAX_CONTRACT = "0x1765e75bbF6cE8C43a13eD91C032A137d102f4d4";
 const BAKED_BEANS_BNB_CONTRACT = "0xE2D26507981A4dAaaA8040bae1846C14E0Fb56bF";
 const ELK_OF_FORTUNE_MINER_CONTRACT = "0xc36d17085b26fc5dCBBB46A6A2068b3AdE2CdAb5";
 const CAKE_OF_FORTUNE__CONTRACT = "0x07694C31d496290632DEFE3Bc048c82B20b28036";
-
+const THE_FORTUNE_MINER_BNB_CONTRACT = "0x2a3d449f828dea5e11a400609dec2eeb077fb838";
 const FROSTED_FLAKES_CONTRACT = "0x1745A5Be4497b4eC1E9666516BD81d8608471D4b";
 
 
 //symbols for rewards.txt, could prob simplify this
 const multiMinerTokens = ['MATIC', 'USDC', 'MATIC', 'AVAX', 'FTM', 'SPELL', 'TOMB'];
 const bakeHouseTokens = ['AVAX', 'BNB'];
-const fortuneHunersTokens = ['ELK', 'CAKE'];
+const fortuneHunersTokens = ['ELK', 'CAKE', 'BNB'];
 const multiMiner = [
 	new ethers.Contract(MATIC_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[0]),
 	new ethers.Contract(POLYGON_USDC_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[0]),
 	new ethers.Contract(MATIC_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[1]),
 	new ethers.Contract(AVAX_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[2]),
-	new ethers.Contract(FTM_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3]),
-	new ethers.Contract(SPELL_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3]),
-	new ethers.Contract(TOMB_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3])
+	//new ethers.Contract(FTM_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3])
+	//new ethers.Contract(SPELL_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3]),
+	//new ethers.Contract(TOMB_MINER_CONTRACT, MULTI_MINER_ABI, ethersWallet[3])
 ];
 const bakeHouse = [
-	new ethers.Contract(TOASTED_AVAX_CONTRACT, TOASTED_AVAX_ABI, ethersWallet[2]),
-	new ethers.Contract(BAKED_BEANS_BNB_CONTRACT, BAKED_BEANS_ABI, ethersWallet[4])
+//	new ethers.Contract(TOASTED_AVAX_CONTRACT, TOASTED_AVAX_ABI, ethersWallet[2]),
+//	new ethers.Contract(BAKED_BEANS_BNB_CONTRACT, BAKED_BEANS_ABI, ethersWallet[4])
 ];
 const fortuneHunters = [
 	new ethers.Contract(ELK_OF_FORTUNE_MINER_CONTRACT, ELK_OF_FORTUNE_ABI, ethersWallet[4]),
-	new ethers.Contract(CAKE_OF_FORTUNE__CONTRACT, CAKE_OF_FORTUNE_ABI, ethersWallet[4])
+	new ethers.Contract(CAKE_OF_FORTUNE__CONTRACT, CAKE_OF_FORTUNE_ABI, ethersWallet[4]),
+	new ethers.Contract(THE_FORTUNE_MINER_BNB_CONTRACT, THE_FORTUNE_MINER_BNB_ABI, ethersWallet[4])
 ];
 const frostedFlakes = [
-	new ethers.Contract(FROSTED_FLAKES_CONTRACT, FROSTED_FLAKES_ABI, ethersWallet[4])
+//	new ethers.Contract(FROSTED_FLAKES_CONTRACT, FROSTED_FLAKES_ABI, ethersWallet[4])
 ];
 //token addresses and contracts
 const usdcToken = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
@@ -175,9 +176,9 @@ async function main() {
 			await minerHelper.Compound(bakeHouse[i], bakeHouseTokens[i]);
 		}
 	}
-	//fortune hunters sell 1st and 15th of month, compound others
+	//fortune hunters sell tuesday, compound others
 	//	if (dateObject.getDay() === 0 || dateObject.getDay() === 14) {
-	if (dateObject.getDay() == 2 || dateObject.getDay() == 5) {
+	if (dateObject.getDay() == 2) {
 
 		for (let i = 0; i < fortuneHunters.length; i++) {
 			await minerHelper.Sell(fortuneHunters[i], fortuneHunersTokens[i]);
