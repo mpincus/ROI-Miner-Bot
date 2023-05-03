@@ -127,10 +127,7 @@ dist
 .pnp.*
 
 #hide
-balance.txt
-pnl.txt
-rewards.txt
+*.txt
 .ROI-Miner-Bot.code-workspace
 ROI-Miner-Bot.code-workspace
 *.xlsx
-log.txt
